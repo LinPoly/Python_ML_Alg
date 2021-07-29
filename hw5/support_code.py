@@ -16,22 +16,22 @@ A few things to note about this code:
       by make_plots (instead of simply calling plt.show)
 '''
 
+
 def generate_data(data_size, noise_params, actual_weights):
     # x1: from [0,1) to [-1,1)
     x1 = -1 + 2 * np.random.rand(data_size, 1)
     # appending the bias term
-    xtrain = np.matrix(np.c_[np.ones((data_size, 1)), x1])
+    xtrain = np.concatenate([np.ones((data_size, 1)), x1], axis=1)
     # random noise
-    noise = np.matrix(np.random.normal(
-                      noise_params["mean"],
-                      noise_params["var"],
-                      (data_size, 1)))
+    noise = np.random.normal(noise_params["mean"], noise_params["var"], data_size)
 
-    ytrain = (xtrain * actual_weights) + noise
+    ytrain = (xtrain@actual_weights) + noise
 
     return xtrain, ytrain
 
-def make_plots(actual_weights, xtrain, ytrain, likelihood_var, prior, likelihood_func, get_posterior_params, get_predictive_params):
+
+def make_plots(actual_weights, xtrain, ytrain, likelihood_var, prior, likelihood_func, get_posterior_params,
+               get_predictive_params):
 
     # #setup for plotting
     #
@@ -63,7 +63,7 @@ def make_plots(actual_weights, xtrain, ytrain, likelihood_var, prior, likelihood
         y_seen = ytrain[:row_num]
         mu, cov = get_posterior_params(x_seen, y_seen,
                                       prior, likelihood_var)
-        posterior_distr = multivariate_normal(mu.T.tolist()[0], cov)
+        posterior_distr = multivariate_normal(mu.T.tolist(), cov)
         posterior_func = lambda x: posterior_distr.pdf(x)
         plt.subplot(num_rows, num_cols, first_column_pos + 1)
         contour_plot(posterior_func, actual_weights)
@@ -81,6 +81,7 @@ def make_plots(actual_weights, xtrain, ytrain, likelihood_var, prior, likelihood
     # #show the final plot
     plt.show()
 
+
 def plot_without_seeing_data(prior, num_rows, num_cols):
 
     #Blank likelihood
@@ -94,7 +95,7 @@ def plot_without_seeing_data(prior, num_rows, num_cols):
     plt.ylim([-0.9, 0.9])
 
     #Prior
-    prior_distribution = multivariate_normal(mean=prior["mean"].T.tolist()[0],
+    prior_distribution = multivariate_normal(mean=prior["mean"].T.tolist(),
         cov=prior["var"])
     prior_func = lambda x:prior_distribution.pdf(x)
     plt.subplot(num_rows, num_cols, 2)
@@ -115,6 +116,7 @@ def plot_without_seeing_data(prior, num_rows, num_cols):
     plt.ylim([-1, 1])
     plt.xlabel("")
     plt.ylabel("")
+
 
 def contour_plot(distribution_func, actual_weights=[]):
 
@@ -142,20 +144,23 @@ def contour_plot(distribution_func, actual_weights=[]):
         plt.plot(float(actual_weights[0]), float(actual_weights[1]),
                  "*k", ms=5)
 
+
 # Plot the specified number of lines of the form y_train = w0 + w1*x in [-1,1]x[-1,1] by
 # drawing w0, w1 from a bivariate normal distribution with specified values
 # for mu = mean and sigma = covariance Matrix. Also plot the data points as
 # circles.
+
+
 def plot_sample_lines(mean, variance,
                     number_of_lines=6,
                     data_points=np.empty((0, 0))):
     step_size = 0.05
     # generate and plot lines
     for round in range(1, number_of_lines):
-        weights = np.matrix(np.random.multivariate_normal(mean.T.tolist()[0], variance)).T
-        x1 = np.arange(-1, 1, step_size)
-        x = np.matrix(np.c_[np.ones((len(x1), 1)), x1])
-        y_train = x * weights
+        weights = np.random.multivariate_normal(mean.T.tolist(), variance)
+        x1 = np.arange(-1, 1, step_size)[..., np.newaxis]
+        x = np.concatenate([np.ones((len(x1), 1)), x1], axis=1)
+        y_train = x @ weights
 
         plt.plot(x1, y_train)
 
@@ -171,6 +176,7 @@ def plot_sample_lines(mean, variance,
     if(data_points.size):
         plt.plot(data_points[:, 0], data_points[:, 1],
                  "co")
+
 
 def plot_predictive_distribution(get_predictive_params,post_mean, post_var):
     step_size = 0.05
