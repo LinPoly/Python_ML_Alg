@@ -40,7 +40,7 @@ def get_posterior_params(X, y, prior: dict, likelihood_var=0.2 ** 2):
 
     Returns:
         post_mean: Posterior mean
-        post_var: Posterior mean
+        post_var: Posterior var
     """
 
     prior_mean, prior_precision = prior['mean'], np.linalg.inv(prior['var'])
@@ -85,7 +85,7 @@ if __name__ == '__main__':
     data_size = 40
     noise = {"mean": 0, "var": 0.2 ** 2}
     likelihood_var = noise["var"]
-    xtrain, ytrain = support_code.generate_data(data_size, noise, actual_weights)
+    x_train, y_train = support_code.generate_data(data_size, noise, actual_weights)
 
     # Question (b)
     sigmas_to_test = [1/2, 1/(2**5), 1/(2**10)]
@@ -94,8 +94,8 @@ if __name__ == '__main__':
                  "var": np.identity(2) * sigma_squared}
 
         support_code.make_plots(actual_weights,
-                                xtrain,
-                                ytrain,
+                                x_train,
+                                y_train,
                                 likelihood_var,
                                 prior,
                                 likelihood_func,

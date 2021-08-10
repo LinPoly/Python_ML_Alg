@@ -269,9 +269,9 @@ def regularized_grad_descent(X, y, alpha=0.05, lambda_reg=10**-2, num_step=1000)
         loss hist - the history of average square loss function without the regularization term, 1D numpy array.
     """
     num_instances, num_features = X.shape[0], X.shape[1]
-    theta = np.zeros(num_features) #Initialize theta
-    theta_hist = np.zeros((num_step+1, num_features)) #Initialize theta_hist
-    loss_hist = np.zeros(num_step+1) #Initialize loss_hist
+    theta = np.zeros(num_features)  # Initialize theta
+    theta_hist = np.zeros((num_step+1, num_features))  # Initialize theta_hist
+    loss_hist = np.zeros(num_step+1)  # Initialize loss_hist
     # TODO
     loss_hist[0] = compute_square_loss(X, y, theta)
 
